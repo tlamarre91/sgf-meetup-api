@@ -10,9 +10,12 @@
 	},
 	"dependencies": {
 		"@aws-sdk/client-secrets-manager": "^3.433.0",
+		"@types/swagger-ui-dist": "^3.30.5",
 		"aws-sdk": "^2.1451.0",
 		"dotenv": "^16.3.1",
+		"express": "^4.19.2",
 		"jsonwebtoken": "^9.0.2",
-		"node-fetch": "^3.3.2"
+		"node-fetch": "^3.3.2",
+		"swagger-ui-dist": "^5.17.14"
 	}
 }

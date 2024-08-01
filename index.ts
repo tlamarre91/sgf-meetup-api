@@ -163,6 +163,18 @@ export class ApiLambdaCrudDynamoDBStack extends Stack {
 			},
 		);
 
+		const swaggerUiLambda = new NodejsFunction(this, 'swaggerUiFunction', {
+			entry: join(__dirname, 'lambdas', 'swaggerUi.ts'),
+			...nodeJsFunctionProps,
+			environment: {
+				NODE_ENV,
+				EVENTS_TABLE_NAME,
+				EVENTS_GROUP_INDEX_NAME,
+				EVENTS_ID_INDEX_NAME,
+				API_KEYS,
+			},
+		});
+
 		new CfnOutput(this, 'getMeetupTokenLambdaInvokePolicyArn', {
 			value: getMeetupTokenLambdaInvokePolicy.managedPolicyArn,
 			description: 'ARN of the policy to invoke lambda',
@@ -182,12 +194,7 @@ export class ApiLambdaCrudDynamoDBStack extends Stack {
 
 		// Integrate the Lambda functions with the API Gateway resource
 		const getEventsIntegration = new LambdaIntegration(getEventsLambda);
-
-		// const certificate = acm.Certificate.fromCertificateArn(
-		// 	this,
-		// 	'domainCert',
-		// 	'arn:aws:acm:us-east-2:391849688676:certificate/c64e30b4-1531-4357-bf80-672b4d8978c8',
-		// );
+		const swaggerUiIntegration = new LambdaIntegration(swaggerUiLambda);
 
 		const domainName = DomainName.fromDomainNameAttributes(
 			this,
@@ -215,6 +222,12 @@ export class ApiLambdaCrudDynamoDBStack extends Stack {
 		const eventsResource = restApi.root.addResource('events');
 		eventsResource.addMethod('GET', getEventsIntegration);
 		addCorsOptions(eventsResource);
+
+		// TODO: what the heck is the right way to say "requests to this path are also OK"
+		const swaggerUiResource = restApi.root.addResource('swagger');
+		const swaggerUiJsonResource = restApi.root.addResource('swagger/swagger.json');
+		swaggerUiResource.addMethod('GET', swaggerUiIntegration);
+		addCorsOptions(swaggerUiResource);
 	}
 }
 
