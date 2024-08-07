@@ -223,10 +223,13 @@ export class ApiLambdaCrudDynamoDBStack extends Stack {
 		eventsResource.addMethod('GET', getEventsIntegration);
 		addCorsOptions(eventsResource);
 
-		// TODO: what the heck is the right way to say "requests to this path are also OK"
 		const swaggerUiResource = restApi.root.addResource('swagger');
-		const swaggerUiJsonResource = restApi.root.addResource('swagger/swagger.json');
 		swaggerUiResource.addMethod('GET', swaggerUiIntegration);
+
+		// Also associate /swagger/swagger.json with swaggerUiIntegration
+		const swaggerUiJsonResource = swaggerUiResource.addResource('swagger.json');
+		swaggerUiJsonResource.addMethod('GET', swaggerUiIntegration);
+
 		addCorsOptions(swaggerUiResource);
 	}
 }

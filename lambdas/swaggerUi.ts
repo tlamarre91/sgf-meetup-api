@@ -5,19 +5,23 @@ import type {
 	Handler,
 } from 'aws-lambda';
 import { absolutePath } from 'swagger-ui-dist'
-import { readFileSync } from 'fs';
+// import { readFileSync } from 'fs';
+
+const swaggerJson = {
+	testKey: 'testVal'
+};
 
 export const handler: Handler = async (event: APIGatewayEvent) => {
 	try {
-		if (event.path === '/swagger.json') {
-			const swaggerJson = readFileSync('./swagger.json');
-			console.log({ swaggerJson });
+		console.log({ event });
+
+		if (event.path === '/swagger/swagger.json') {
 			return {
 				statusCode: 200,
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: swaggerJson
+				body: JSON.stringify(swaggerJson)
 			};
 		}
 		console.log({ absolutePath: absolutePath() });
