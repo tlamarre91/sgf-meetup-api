@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: sgf-meetup-api - Springfield Meetup Events API
+  description: |-
+    A simple API for Springfield, MO organizations to query their upcoming events.
+    
+    Some useful links:
+    - [github.com/Open-SGF/sgf-meetup-api](https://github.com/Open-SGF/sgf-meetup-api)
+
+  termsOfService: https://github.com/Open-SGF/sgf-meetup-api/blob/main/TERMS.md
+  contact:
+    email: opensgf@gmail.com
+  license:
+    name: MIT
+    url: https://github.com/Open-SGF/sgf-meetup-api/blob/main/LICENSE.md
+  version: 0.1.0
+
+servers:
+  - url: https://sgf-meetup-api.opensgf.org
+tags:
+  - name: events
+    description: Events for a Meetup.com group
+
+paths:
+  /events:
+    get:
+      tags:
+        - events
+      summary: Finds events for a Meetup.com group
+      description: Date ranges can be specified with the `after` and `before` parameters
+      operationId: getEvents
+      parameters:
+        - name: group
+          in: query
+          description: Meetup.com group name
+          required: true
+          explode: false
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'          
+        '400':
+          description: Invalid status value
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "298237443"
+        group:
+          type: object
+          example: { "name": "Open SGF", "urlname": "open-sgf"}
+        title:
+          type: string
+          example: "Code & Demo Night"
+        eventUrl:
+          type: string
+          example: "https://www.meetup.com/open-sgf/events/298237443"
+        description:
+          type: string
+          example: "Description of event"
+        dateTime:
+          type: string
+          example: "2024-01-17T00:30:00.000Z"
+        duration: 
+          type: string
+          example: "PT2H"
+        venue:
+          type: object
+          example: {
+            "name": "efactory",
+            "address": "405 N Jefferson Ave",
+            "city": "Springfield",
+            "state": "MO",
+            "postalCode": "65806"
+          }
+        host: 
+          type: object
+          example: { "name": "Hosty MacHoster" }
+        images:
+          type: array
+          items:
+            type: string
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: '##default'
+  requestBodies:
+    Pet:
+      description: Pet object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pet'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Pet'
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
